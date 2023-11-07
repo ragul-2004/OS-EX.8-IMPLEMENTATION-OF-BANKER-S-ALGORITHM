@@ -1,85 +1,115 @@
 # OS-EX.8-IMPLEMENTATION-OF-BANKER-S-ALGORITHM
 
 ## AIM:
-To implement the bankers Algorithm 
+To write a C program to implement Bankers Algorithm.
+
 ## ALGORITHM:
-### Step 1: Initialize Data
-* Set n to 5 (number of processes) and m to 3 (number of resource types).
-* Initialize the alloc matrix with the allocation of resources to processes.
-* Initialize the max matrix with the maximum demand of resources for each process.
-* Initialize the avail list with the available resources.
-* Initialize arrays f, ans, and ind to manage process states and safe sequence.
-### Step 2: Initialize Flags and Need Matrix
-* Initialize the array f to keep track of whether each process is finished (all initially set to 0).
-* Create an empty matrix need to represent the resource needs of each process.
-### Step 3: Calculate Need Matrix
-* Calculate the need matrix by subtracting the alloc matrix from the max matrix for each process and resource.
-### Step 4: Main Loop
-* Loop k from 0 to 4 (5 iterations, one for each process).
-* Inside the loop:
-* Loop through each process i (0 to 4).
-* Check if process i is not finished (f[i] == 0).
-* Initialize flag to 0.
-* Loop through each resource type j (0 to 2).
-* Check if the resource need of process i for resource j exceeds the available resource avail[j].
-* If it does, set flag to 1 and break out of the inner loop.
-* If flag is still 0 (i.e., all resource needs are satisfied), add process i to the ans array and increment ind.
-* Update the available resources by adding the allocated resources of process i to avail.
-* Mark process i as finished by setting f[i] to 1.
-### Step 5: Print the SAFE Sequence
-* Print "Following is the SAFE Sequence" as a header.
-* Loop through the processes in the ans array and print them as the safe sequence, separated by " -> ".
-* Print the last process in the sequence.
+1: Get the no of processes.
+
+2: Get the process numbers.
+
+3: Get the no of resources types and instances of it.
+
+4: Get Max demand of each process of n x m matrices.
+
+5: Get the n x m matrices the number of resources of each type currently allocated to each process.
+
+6: Calculate the n x m of the remaining resource need of each process.
+
+7: Initialize work as available resource and array of finish to false.
+
+8: Check the Needed resource is lesser than the available resource if not display the System not in safe state and if it is lesser than system in safe state.
+
+9: Initialize work as sum of work and allocation, check if array of finish is true go to step 7 again if not go to step 8.
+
+10: Check that request can be immediately granted.
+
+11: If single request is lesser than or equal to available if true means arrive to new state.
+
+12: Print the sequence if it is in safe state or print not in safe state.
+
 ## PROGRAM:
 ```
-n = 5
-m = 3
+#include <stdio.h>
+int main()
+{
 
-alloc = [[0, 1, 0 ],[ 2, 0, 0 ],
-        [3, 0, 2 ],[2, 1, 1] ,[ 0, 0, 2]]
+	int n, m, i, j, k;
+	n = 5; // Number of processes
+	m = 3; // 
+	int alloc[5][3] = { { 0, 1, 0 }, // P0 // Allocation Matrix
+						{ 2, 0, 0 }, // P1
+						{ 3, 0, 2 }, // P2
+						{ 2, 1, 1 }, // P3
+						{ 0, 0, 2 } }; // P4
 
-max = [[7, 5, 3 ],[3, 2, 2 ],
-        [ 9, 0, 2 ],[2, 2, 2],[4, 3, 3]]
+	int max[5][3] = { { 7, 5, 3 }, // P0 // MAX Matrix
+					{ 3, 2, 2 }, // P1
+					{ 9, 0, 2 }, // P2
+					{ 2, 2, 2 }, // P3
+					{ 4, 3, 3 } }; // P4
 
-avail = [3, 3, 2]
+	int avail[3] = { 3, 3, 2 }; // Available Resources
 
-f = [0]*n
-ans = [0]*n
-ind = 0
+	int f[n], ans[n], ind = 0;
+	for (k = 0; k < n; k++) {
+		f[k] = 0;
+	}
+	int need[n][m];
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < m; j++)
+			need[i][j] = max[i][j] - alloc[i][j];
+	}
+	int y = 0;
+	for (k = 0; k < 5; k++) {
+		for (i = 0; i < n; i++) {
+			if (f[i] == 0) {
 
-for k in range(n):
-    f[k] = 0
+				int flag = 0;
+				for (j = 0; j < m; j++) {
+					if (need[i][j] > avail[j]){
+						flag = 1;
+						break;
+					}
+				}
 
-need = [[ 0 for i in range(m)]for i in range(n)]
-for i in range(n):
-    for j in range(m):
-        need[i][j] = max[i][j] - alloc[i][j]
-y = 0
-for k in range(5):
-    for i in range(n):
-        if (f[i] == 0):
-            flag = 0
-            for j in range(m):
-                if (need[i][j] > avail[j]):
-                    flag = 1
-                    break
+				if (flag == 0) {
+					ans[ind++] = i;
+					for (y = 0; y < m; y++)
+						avail[y] += alloc[i][y];
+					f[i] = 1;
+				}
+			}
+		}
+	}
 
-            if (flag == 0):
-                ans[ind] = i
-                ind += 1
-                for y in range(m):
-                    avail[y] += alloc[i][y]
-                f[i] = 1
+	int flag = 1;
+	
+	for(int i=0;i<n;i++)
+	{
+	if(f[i]==0)
+	{
+		flag=0;
+		printf("The following system is not safe");
+		break;
+	}
+	}
+	
+	if(flag==1)
+	{
+	printf("Following is the SAFE Sequence\n");
+	for (i = 0; i < n - 1; i++)
+		printf(" P%d ->", ans[i]);
+	printf(" P%d", ans[n - 1]);
+	}
+	
 
-print("Following is the SAFE Sequence")
-
-for i in range(n - 1):
-    print(" P", ans[i], " ->", sep="", end="")
-print(" P", ans[n - 1], sep="")
-
+	return (0);
+}
 ```
+
 ## OUTPUT:
-![](1.png)
+![image](https://github.com/Thirukaalathessvarar-S/OS-EX.8-IMPLEMENTATION-OF-BANKER-S-ALGORITHM/assets/121166390/0df16bd2-d0bb-495a-a346-8d6b61b26bf5)
+
 ## RESULT:
-Thus the program for the bankers algorithm is implemented successfully.
- 
+Thus, implement Bankers Algorithm to avoid Deadlock is implemented successfully using C program.
